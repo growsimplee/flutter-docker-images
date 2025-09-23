@@ -62,12 +62,18 @@ jobs:
 
             git push https://$GITHUB_ACCESS_TOKEN@github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git "$BRANCH_NAME"
 
-            # Create PR using gh CLI
-            gh pr create \
-              --title "Bump $FOLDER version to $NEW_VERSION" \
-              --body "Automatic version bump by CI" \
-              --base main \
-              --head "$BRANCH_NAME"
+            # Create PR using curl
+            echo "Creating PR using curl"
+            curl -s -X POST \
+              -H "Authorization: token $GITHUB_ACCESS_TOKEN" \
+              -H "Accept: application/vnd.github+json" \
+              https://api.github.com/repos/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/pulls \
+              -d "{
+                    \"title\": \"Bump $FOLDER version to $NEW_VERSION\",
+                    \"head\": \"$BRANCH_NAME\",
+                    \"base\": \"main\",
+                    \"body\": \"Automatic version bump by CI\"
+                  }"
 
 workflows:
   build:
