@@ -30,18 +30,18 @@ RUN mkdir -p ${ANDROID_SDK_ROOT}/cmdline-tools && \
 # 5. Install SDK packages first (triggers license generation)
 RUN yes | sdkmanager \
     "platform-tools" \
-    "build-tools;30.0.3" \
-    "ndk;23.1.7779620" \
-    "cmake;3.18.1" \
-    "platforms;android-33" \
+    "build-tools;35.0.1" \
+    "ndk;29.0.13846066 rc3" \
+    "cmake;3.22.1" \
     "platforms;android-34" \
-    "platforms;android-35"
+    "platforms;android-35" \
+    "platforms;android-36"
 
 # 6. Accept all SDK licenses AFTER installing packages
 RUN yes | sdkmanager --licenses
 
 # 7. Install Flutter SDK
-ENV FLUTTER_VERSION=3.24.2
+ENV FLUTTER_VERSION=3.27.0
 ENV FLUTTER_HOME=/opt/flutter
 ENV PATH="${PATH}:${FLUTTER_HOME}/bin"
 
