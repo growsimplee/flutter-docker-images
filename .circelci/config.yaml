@@ -1,0 +1,78 @@
+version: 2.1
+
+jobs:
+  build-flutter:
+    docker:
+      - image: cimg/base:stable
+    parameters:
+      flutter_folder:
+        type: string
+    steps:
+      - checkout
+
+      - setup_remote_docker:
+          version: 20.10.18
+
+      - run:
+          name: DockerHub Login
+          command: echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USER" --password-stdin
+
+      - run:
+          name: Build & Push Flutter Image
+          command: |
+            set -e
+            FOLDER=<< parameters.flutter_folder >>
+            VERSION_FILE="$FOLDER/versions"
+
+            # Read current version
+            CURRENT_VERSION=$(cat $VERSION_FILE)
+            NEW_VERSION=$((CURRENT_VERSION + 1))
+            echo "Current version: $CURRENT_VERSION, New version: $NEW_VERSION"
+
+            # Build Docker image
+            docker build -f $FOLDER/Dockerfile \
+              -t $DOCKERHUB_USER/${FOLDER#*/}:latest \
+              -t $DOCKERHUB_USER/${FOLDER#*/}:$NEW_VERSION .
+
+            # Push both tags
+            docker push $DOCKERHUB_USER/${FOLDER#*/}:latest
+            docker push $DOCKERHUB_USER/${FOLDER#*/}:$NEW_VERSION
+
+            # Update version file
+            echo $NEW_VERSION > $VERSION_FILE
+
+      - run:
+          name: Commit Version Bump & Create PR
+          command: |
+            git config --global user.email "circleci@yourdomain.com"
+            git config --global user.name "CircleCI Bot"
+
+            git checkout -b update-version-${FOLDER#*/}
+
+            git add $FOLDER/versions
+            git commit -m "Bump version for ${FOLDER#*/} to $NEW_VERSION"
+
+            git push origin update-version-${FOLDER#*/}
+
+            # Create PR using gh CLI (make sure GITHUB_TOKEN is set in CircleCI)
+            gh pr create --title "Bump ${FOLDER#*/} version to $NEW_VERSION" \
+                         --body "Automatic version bump by CI" \
+                         --base main \
+                         --head update-version-${FOLDER#*/}
+
+workflows:
+  build:
+    jobs:
+      - build-flutter:
+          name: build-flutter-3-24-2
+          flutter_folder: flutter-3.24.2
+          filters:
+            branches:
+              only: build-flutter-3.24.2
+
+      - build-flutter:
+          name: build-flutter-3-27-0
+          flutter_folder: flutter-3.27.0
+          filters:
+            branches:
+              only: build-flutter-3.27.0
