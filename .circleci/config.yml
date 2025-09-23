@@ -74,6 +74,18 @@ jobs:
                     \"base\": \"main\",
                     \"body\": \"Automatic version bump by CI\"
                   }"
+  test-job:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - run:
+          name: Test Task
+          command: |
+            echo "This is a lightweight test job running on branch 'test'"
+            echo "Current directory: $(pwd)"
+            echo "List files:"
+            ls -la
 
 workflows:
   build:
@@ -91,3 +103,9 @@ workflows:
           filters:
             branches:
               only: build-flutter-3.27.0
+      
+      - test-job:
+          name: test-job
+          filters:
+            branches:
+              only: test
