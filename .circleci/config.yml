@@ -18,7 +18,7 @@ jobs:
           command: echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USER" --password-stdin
 
       - run:
-          name: Build & Push Flutter Image
+          name: Build & Push Flutter Docker Image
           command: |
             set -e
             FOLDER=<< parameters.flutter_folder >>
@@ -44,21 +44,25 @@ jobs:
       - run:
           name: Commit Version Bump & Create PR
           command: |
-            git config --global user.email "circleci@yourdomain.com"
+            git config --global user.email "circleci-bot@yourproject.com"
             git config --global user.name "CircleCI Bot"
 
+            # Create a new branch for the version bump
             git checkout -b update-version-${FOLDER#*/}
 
-            git add $FOLDER/versions
+            # Stage and commit version bump
+            git add $VERSION_FILE
             git commit -m "Bump version for ${FOLDER#*/} to $NEW_VERSION"
 
-            git push origin update-version-${FOLDER#*/}
+            # Push branch
+            git push https://$GITHUB_ACCESS_TOKEN@github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git update-version-${FOLDER#*/}
 
-            # Create PR using gh CLI (make sure GITHUB_TOKEN is set in CircleCI)
-            gh pr create --title "Bump ${FOLDER#*/} version to $NEW_VERSION" \
-                         --body "Automatic version bump by CI" \
-                         --base main \
-                         --head update-version-${FOLDER#*/}
+            # Create PR using gh CLI
+            gh pr create \
+              --title "Bump ${FOLDER#*/} version to $NEW_VERSION" \
+              --body "Automatic version bump by CI" \
+              --base main \
+              --head update-version-${FOLDER#*/}
 
 workflows:
   build:
