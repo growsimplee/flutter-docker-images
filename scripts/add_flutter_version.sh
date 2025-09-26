@@ -31,6 +31,17 @@ require_cmd() {
   fi
 }
 
+git_create_or_switch_branch() {
+  local branch="$1"
+  if git rev-parse --verify "$branch" >/dev/null 2>&1; then
+    git checkout "$branch" >/dev/null
+    echo -e "${YELLOW}Switched:${RESET} existing branch '$branch'"
+  else
+    git checkout -b "$branch" >/dev/null
+    echo -e "${GREEN}Created:${RESET} new branch '$branch'"
+  fi
+}
+
 prompt_version() {
   local v
   read -r -p "Enter Flutter version (e.g., 3.29.0): " v
@@ -117,6 +128,10 @@ main() {
   local new_folder="flutter-$version"
   local config_file=".circleci/config.yml"
 
+  # Create/switch to branch first as requested
+  local branch="build-flutter-$version"
+  git_create_or_switch_branch "$branch"
+
   require_file "$config_file"
 
   # Pick source folder to copy Dockerfile from
@@ -155,12 +170,9 @@ main() {
   # Update CI config
   append_ci_job "$config_file" "$version"
 
-  # Create branch and commit changes
-  local branch="build-flutter-$version"
-  git checkout -b "$branch"
   git add "$new_folder" "$config_file"
   git commit -m "Add flutter-$version image and CI job"
-  echo -e "${GREEN}Created branch:${RESET} $branch and committed changes."
+  echo -e "${GREEN}Committed:${RESET} changes on branch '$branch'"
 
   echo
   echo -e "${GREEN}Done!${RESET} Next steps:"
