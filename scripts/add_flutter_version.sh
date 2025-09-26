@@ -170,14 +170,14 @@ main() {
   # Update CI config
   append_ci_job "$config_file" "$version"
 
-  git add "$new_folder" "$config_file"
-  git commit -m "Add flutter-$version image and CI job"
-  echo -e "${GREEN}Committed:${RESET} changes on branch '$branch'"
+  echo -e "${GREEN}Prepared changes:${RESET} on branch '$branch' (no commit made)"
 
   echo
   echo -e "${GREEN}Done!${RESET} Next steps:"
   echo "- Review $new_folder/Dockerfile and adjust Android SDK packages if needed."
-  echo "- Optionally push the branch: git push -u origin $branch"
+  echo "- Review pending changes: git status && git diff"
+  echo "- Commit when ready: git add $new_folder $config_file && git commit -m 'Add flutter-$version image and CI job'"
+  echo "- Push the branch: git push -u origin $branch"
 }
 
 main "$@"

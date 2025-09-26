@@ -149,11 +149,13 @@ What this does:
 - Updates `ENV FLUTTER_VERSION=<version>` inside that `Dockerfile`
 - Creates `flutter-<version>/versions` with a single line: `0`
 - Appends a new CI job in `.circleci/config.yml` for branch `build-flutter-<version>`
-- Creates and checks out a git branch `build-flutter-<version>` and commits the changes
+- Creates and checks out a git branch `build-flutter-<version>` (no commit is made)
 
 After running:
 1. Review `flutter-<version>/Dockerfile` and adjust Android SDK packages if needed
-2. Push the branch to trigger CI: `git push -u origin build-flutter-<version>`
+2. Review diffs: `git status && git diff`
+3. Commit when ready: `git add flutter-<version> .circleci/config.yml && git commit -m "Add flutter-<version> image and CI job"`
+4. Push the branch to trigger CI: `git push -u origin build-flutter-<version>`
 
 ---
 
