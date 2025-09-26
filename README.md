@@ -132,13 +132,28 @@ The workflow in `.circleci/config.yml` provides jobs to build and push each imag
 
 ## Adding a new Flutter version ➕
 
-1. Copy an existing folder (e.g., `flutter-3.27.0`) and rename it (e.g., `flutter-3.29.0`)
-2. Edit its `Dockerfile`:
-   - Update `FLUTTER_VERSION`
-   - Adjust Android SDK packages (build-tools, NDK, CMake, platforms) if needed
-3. Create a `versions` file with `0` (or the last deployed number if migrating)
-4. Update `.circleci/config.yml` to add a new job with branch filter `build-flutter-<version>`
-5. Push a branch named `build-flutter-<version>` to trigger the CI build and publish
+Grant this pre-configured script permission to run:
+```bash
+chmod +x scripts/add_flutter_version.sh
+```
+
+Use the helper script to scaffold everything:
+```bash
+bash scripts/add_flutter_version.sh 3.29.0
+# or interactively (will prompt for version):
+bash scripts/add_flutter_version.sh
+```
+
+What this does:
+- Creates `flutter-<version>/` with a `Dockerfile` copied from the latest existing folder
+- Updates `ENV FLUTTER_VERSION=<version>` inside that `Dockerfile`
+- Creates `flutter-<version>/versions` with a single line: `0`
+- Appends a new CI job in `.circleci/config.yml` for branch `build-flutter-<version>`
+- Creates and checks out a git branch `build-flutter-<version>` and commits the changes
+
+After running:
+1. Review `flutter-<version>/Dockerfile` and adjust Android SDK packages if needed
+2. Push the branch to trigger CI: `git push -u origin build-flutter-<version>`
 
 ---
 
