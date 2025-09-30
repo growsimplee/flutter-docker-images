@@ -109,3 +109,15 @@ workflows:
           filters:
             branches:
               only: test
+      - build-flutter:
+          name: build-flutter-3-35-0
+          flutter_folder: flutter-3.35.0
+          filters:
+            branches:
+              only: build-flutter-3.35.0
+      - build-flutter:
+          name: build-flutter-3-32-8
+          flutter_folder: flutter-3.32.8
+          filters:
+            branches:
+              only: build-flutter-3.32.8
