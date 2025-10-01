@@ -31,6 +31,7 @@ RUN mkdir -p ${ANDROID_SDK_ROOT}/cmdline-tools && \
 RUN yes | sdkmanager \
     "platform-tools" \
     "build-tools;34.0.0" \
+    "build-tools;35.0.1" \
     "ndk;29.0.13846066" \
     "cmake;3.22.1" \
     "platforms;android-34" \
