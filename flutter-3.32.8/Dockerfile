@@ -30,6 +30,7 @@ RUN mkdir -p ${ANDROID_SDK_ROOT}/cmdline-tools && \
 # 5. Install SDK packages first (triggers license generation)
 RUN yes | sdkmanager \
     "platform-tools" \
+    "build-tools;34.0.0" \
     "build-tools;35.0.1" \
     "ndk;29.0.13846066" \
     "cmake;3.22.1" \
