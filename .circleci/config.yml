@@ -133,3 +133,9 @@ workflows:
           filters:
             branches:
               only: build-flutter-3.44.0
+      - build-flutter:
+          name: build-flutter-3-44-6
+          flutter_folder: flutter-3.44.6
+          filters:
+            branches:
+              only: build-flutter-3.44.6
